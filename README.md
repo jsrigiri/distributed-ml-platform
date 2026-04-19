@@ -4,6 +4,8 @@
 ![Spark](https://img.shields.io/badge/Spark-Batch%20Processing-orange)
 ![Boosting](https://img.shields.io/badge/Boosting-XGBoost%20%7C%20LightGBM-yellow)
 ![API](https://img.shields.io/badge/API-FastAPI-green)
+![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-purple)
+![Docker](https://img.shields.io/badge/Container-Docker-blue)
 ![Tests](https://img.shields.io/badge/Tests-Pytest-blue)
 ![Status](https://img.shields.io/badge/Status-Production--Ready-brightgreen)
 
@@ -18,6 +20,8 @@ This project implements a **production-grade distributed machine learning platfo
 - Hybrid model architecture (baseline + boosting)  
 - Model registry + promotion logic  
 - FastAPI inference service  
+- Dockerized deployment workflow  
+- CI/CD pipeline with automated testing  
 
 Supports:
 
@@ -39,6 +43,7 @@ Build a scalable ML system that:
 - Supports multiple model families  
 - Automatically selects best model  
 - Serves predictions with low latency  
+- Ships through repeatable CI/CD and container workflows  
 
 ---
 
@@ -60,6 +65,8 @@ FastAPI Service
 Online Feature Builder (Per-user state)
    ↓
 Predictions + Metrics
+   ↓
+Docker + CI/CD Deployment Workflow
 ```
 
 ---
@@ -74,6 +81,8 @@ Predictions + Metrics
 | Storage            | Parquet |
 | Serialization      | Joblib |
 | Testing            | Pytest |
+| Containerization   | Docker, Docker Compose |
+| CI/CD              | GitHub Actions |
 
 ---
 
@@ -81,6 +90,9 @@ Predictions + Metrics
 
 ```text
 distributed-ml-platform/
+├── .github/
+│   └── workflows/
+│       └── ci.yml
 ├── api/
 ├── core/
 ├── models/
@@ -90,6 +102,9 @@ distributed-ml-platform/
 ├── tests/
 ├── artifacts/
 ├── data/
+├── Dockerfile
+├── docker-compose.yml
+├── Makefile
 ├── main.py
 ├── generate_data.py
 ├── requirements.txt
@@ -147,6 +162,54 @@ distributed-ml-platform/
 
 ---
 
+## 🐳 Docker
+
+### Build image
+
+```bash
+docker build -t distributed-ml-platform .
+```
+
+### Run container
+
+```bash
+docker run -p 8000:8000 distributed-ml-platform
+```
+
+### Run with Docker Compose
+
+```bash
+docker-compose up --build
+```
+
+This gives you:
+- Reproducible runtime environment  
+- Portable API deployment  
+- Cleaner local and cloud handoff  
+
+---
+
+## 🔁 CI/CD
+
+The project includes **GitHub Actions CI** via:
+
+```text
+.github/workflows/ci.yml
+```
+
+The pipeline runs:
+
+- Dependency installation  
+- Sample data generation  
+- Automated test suite with `pytest -v`  
+
+This helps ensure:
+- Every push is validated  
+- Regressions are caught early  
+- The project stays deployment-ready  
+
+---
+
 ## 🧪 Testing (Pytest)
 
 Run:
@@ -161,6 +224,7 @@ pytest -v
 - Feature pipelines  
 - Model training  
 - Model registry  
+- CI validation path  
 
 ---
 
@@ -245,6 +309,8 @@ http://127.0.0.1:8000/docs
 - Multi-model training (LR + XGBoost + LightGBM)  
 - Automated model selection  
 - Production-grade API  
+- Dockerized deployment  
+- CI/CD with GitHub Actions  
 
 ---
 
@@ -255,6 +321,7 @@ http://127.0.0.1:8000/docs
 - Integrated gradient boosting models  
 - Implemented model lifecycle management  
 - Enabled real-time inference  
+- Added Docker + CI/CD for production-style delivery  
 
 ---
 
