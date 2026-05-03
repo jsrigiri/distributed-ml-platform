@@ -203,7 +203,7 @@ uvicorn api.app:app --reload
 
 ---
 
-## 🧠 Interview Talking Points
+## 🧠 Talking Points
 
 - Built end-to-end ML platform  
 - Designed feature store system  
