@@ -1,7 +1,6 @@
 from fastapi import FastAPI, HTTPException
 import pandas as pd
 
-from api.deps import predictor, registry, online_builder
 from api.schemas import OnlineEventRequest, PredictionRequest, PredictionResponse
 from core.config import FEATURE_COLUMNS, settings
 from core.logging import get_logger, setup_logging
@@ -35,9 +34,17 @@ def health():
 def ready():
     champion_predictor.reload_if_exists()
     challenger_predictor.reload_if_exists()
+
+    champion_ready = champion_predictor.is_ready()
+    challenger_ready = challenger_predictor.is_ready()
+
     return {
-        "champion_ready": champion_predictor.is_ready(),
-        "challenger_ready": challenger_predictor.is_ready(),
+        # ✅ backward compatibility for tests
+        "ready": champion_ready,
+
+        # ✅ new production fields
+        "champion_ready": champion_ready,
+        "challenger_ready": challenger_ready,
         "champion_exists": champion_registry.exists(),
         "challenger_exists": challenger_registry.exists(),
     }
@@ -50,9 +57,16 @@ def get_metrics():
 
 @app.get("/model_info")
 def model_info():
+    champion_meta = champion_registry.load_metadata()
+    challenger_meta = challenger_registry.load_metadata()
+
     return {
-        "champion": champion_registry.load_metadata(),
-        "challenger": challenger_registry.load_metadata(),
+        # ✅ backward compatibility for tests
+        "status": champion_meta.get("status", "unknown"),
+
+        # ✅ full production info
+        "champion": champion_meta,
+        "challenger": challenger_meta,
     }
 
 
@@ -61,7 +75,11 @@ def predict(req: PredictionRequest):
     champion_predictor.reload_if_exists()
     challenger_predictor.reload_if_exists()
 
-    predictor = champion_predictor if req.model_variant == "champion" else challenger_predictor
+    predictor = (
+        champion_predictor
+        if req.model_variant == "champion"
+        else challenger_predictor
+    )
 
     if not predictor.is_ready():
         raise HTTPException(
@@ -70,19 +88,14 @@ def predict(req: PredictionRequest):
         )
 
     row = req.model_dump()
-    row.pop("model_variant")
+    row.pop("model_variant", None)
+
     df = pd.DataFrame([row], columns=FEATURE_COLUMNS)
 
     pred = int(predictor.predict(df)[0])
     prob = float(predictor.predict_proba(df)[0][1])
 
     metrics.log_prediction(prob)
-    logger.info(
-        "prediction_request variant=%s prediction=%s probability_positive=%.6f",
-        req.model_variant,
-        pred,
-        prob,
-    )
 
     return PredictionResponse(
         prediction=pred,

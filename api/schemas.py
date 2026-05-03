@@ -1,6 +1,8 @@
 from typing import Literal
 from pydantic import BaseModel, Field
 
+model_variant: Literal["champion", "challenger"] = "champion"
+
 
 class PredictionRequest(BaseModel):
     event_value: float
