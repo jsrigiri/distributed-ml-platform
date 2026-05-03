@@ -22,6 +22,18 @@ class Settings(BaseSettings):
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
+    champion_model_path: str = "artifacts/models/champion.pkl"
+    challenger_model_path: str = "artifacts/models/challenger.pkl"
+    champion_meta_path: str = "artifacts/models/champion_meta.json"
+    challenger_meta_path: str = "artifacts/models/challenger_meta.json"
+
+    stream_input_path: str = "data/stream_input"
+    stream_checkpoint_path: str = "data/checkpoints/events"
+    stream_output_path: str = "data/stream_output"
+
+    kafka_bootstrap_servers: str = "localhost:9092"
+    kafka_topic_events: str = "raw-events"
+    kafka_consumer_group: str = "distributed-ml-platform-consumer"
 
 settings = Settings()
 

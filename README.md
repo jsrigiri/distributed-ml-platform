@@ -1,7 +1,8 @@
-# 🚀 Distributed ML Platform (Spark + Online Features + XGBoost + LightGBM)
+# 🚀 Distributed ML Platform (Spark + Kafka + XGBoost + LightGBM)
 
 ![Python](https://img.shields.io/badge/Python-3.11+-blue)
 ![Spark](https://img.shields.io/badge/Spark-Batch%20Processing-orange)
+![Streaming](https://img.shields.io/badge/Streaming-Kafka-red)
 ![Boosting](https://img.shields.io/badge/Boosting-XGBoost%20%7C%20LightGBM-yellow)
 ![API](https://img.shields.io/badge/API-FastAPI-green)
 ![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-purple)
@@ -13,37 +14,28 @@
 
 ## 📌 Overview
 
-This project implements a **production-grade distributed machine learning platform** with:
+This project implements a **production-grade distributed machine learning platform** combining:
 
-- Batch feature engineering using Spark  
-- Online feature generation (real-time stateful features)  
-- Hybrid model architecture (baseline + boosting)  
-- Model registry + promotion logic  
-- FastAPI inference service  
-- Dockerized deployment workflow  
-- CI/CD pipeline with automated testing  
-
-Supports:
-
-- Classification → event prediction  
-- Regression → continuous target prediction  
-- Models:
-  - Logistic Regression  
-  - XGBoost  
-  - LightGBM  
+- Spark batch feature engineering  
+- Kafka real-time streaming ingestion  
+- Online + offline feature pipelines  
+- Multi-model training (LR, XGBoost, LightGBM)  
+- Champion/Challenger deployment  
+- MLflow experiment tracking  
+- FastAPI serving layer  
+- Docker + CI/CD  
 
 ---
 
 ## 🧠 Problem Statement
 
-Build a scalable ML system that:
+Design a system that:
 
-- Processes event streams  
-- Maintains online + offline feature parity  
-- Supports multiple model families  
-- Automatically selects best model  
+- Handles batch + real-time data  
+- Maintains feature consistency  
+- Supports multiple models  
+- Automates model promotion  
 - Serves predictions with low latency  
-- Ships through repeatable CI/CD and container workflows  
 
 ---
 
@@ -52,225 +44,135 @@ Build a scalable ML system that:
 ```text
 Raw Events (CSV)
    ↓
-Spark Batch Feature Pipeline
+Spark Batch Pipeline
    ↓
 Offline Feature Store (Parquet)
    ↓
-Training Pipeline (Multi-Model)
+Training (MLflow + Multi-Model)
    ↓
-Model Registry
+Model Registry (Champion/Challenger)
    ↓
-FastAPI Service
+FastAPI API
    ↓
-Online Feature Builder (Per-user state)
+Online Feature Builder
+   ↓
+Kafka Streaming Layer
    ↓
 Predictions + Metrics
-   ↓
-Docker + CI/CD Deployment Workflow
 ```
 
 ---
 
 ## ⚙️ Tech Stack
 
-| Layer              | Tools |
-|-------------------|------|
-| Data Processing    | PySpark, Pandas, NumPy |
-| ML Models          | Scikit-learn, XGBoost, LightGBM |
-| API                | FastAPI |
-| Storage            | Parquet |
-| Serialization      | Joblib |
-| Testing            | Pytest |
-| Containerization   | Docker, Docker Compose |
-| CI/CD              | GitHub Actions |
-
----
-
-## 📂 Project Structure
-
-```text
-distributed-ml-platform/
-├── .github/
-│   └── workflows/
-│       └── ci.yml
-├── api/
-├── core/
-├── models/
-├── pipelines/
-├── store/
-├── monitoring/
-├── tests/
-├── artifacts/
-├── data/
-├── Dockerfile
-├── docker-compose.yml
-├── Makefile
-├── main.py
-├── generate_data.py
-├── requirements.txt
-└── README.md
-```
+| Layer | Tools |
+|------|------|
+| Batch Processing | PySpark |
+| Streaming | Kafka |
+| ML | Scikit-learn, XGBoost, LightGBM |
+| Tracking | MLflow |
+| API | FastAPI |
+| Storage | Parquet |
+| DevOps | Docker, GitHub Actions |
+| Testing | Pytest |
 
 ---
 
 ## 🧠 Models
 
-### Baseline Model
-- Logistic Regression  
-- Fast and interpretable  
+### Baseline
+- Logistic Regression
 
-### Boosting Models
-- XGBoost (Classifier + Regressor)  
-- LightGBM (Classifier + Regressor)  
-- Captures non-linear relationships  
+### Advanced
+- XGBoost (Classifier + Regressor)
+- LightGBM (Classifier + Regressor)
 
-### Model Selection
-- Automatically selects best model based on accuracy  
-- Stores all model metrics in registry  
-
----
-
-## 📊 Metrics
-
-### Classification
-- Accuracy  
-- Precision  
-- Recall  
-- F1 Score  
-
-### Regression
-- RMSE  
-
-### System Metrics
-- Prediction requests  
-- Online feature updates  
-- Model readiness  
-
----
-
-## ⚡ Feature Engineering
-
-### Batch (Spark)
-- Lag features  
-- Rolling statistics  
-- Aggregations  
-
-### Online
-- Stateful per-user tracking  
-- Rolling windows  
-- Warmup logic  
+### Strategy
+- Train multiple models
+- Evaluate performance
+- Promote best model
 
 ---
 
 ## 🐳 Docker
 
-### Build image
-
 ```bash
-docker build -t distributed-ml-platform .
+docker build -t ml-platform .
+docker run -p 8000:8000 ml-platform
 ```
-
-### Run container
-
-```bash
-docker run -p 8000:8000 distributed-ml-platform
-```
-
-### Run with Docker Compose
-
-```bash
-docker-compose up --build
-```
-
-This gives you:
-- Reproducible runtime environment  
-- Portable API deployment  
-- Cleaner local and cloud handoff  
 
 ---
 
 ## 🔁 CI/CD
 
-The project includes **GitHub Actions CI** via:
+GitHub Actions pipeline:
 
-```text
-.github/workflows/ci.yml
-```
-
-The pipeline runs:
-
-- Dependency installation  
-- Sample data generation  
-- Automated test suite with `pytest -v`  
-
-This helps ensure:
-- Every push is validated  
-- Regressions are caught early  
-- The project stays deployment-ready  
+- Install dependencies
+- Generate sample data
+- Run pytest
+- Validate project
 
 ---
 
-## 🧪 Testing (Pytest)
+## 🔴 Kafka Streaming
 
-Run:
+### Start Kafka
+
+```bash
+docker-compose up kafka
+```
+
+### IMPORTANT
+
+Use:
+
+```yaml
+image: apache/kafka:4.1.2
+```
+
+---
+
+### Run consumer
+
+```bash
+python -m scripts.kafka_consumer
+```
+
+### Run producer
+
+```bash
+python -m scripts.kafka_producer
+```
+
+---
+
+### Streaming Flow
+
+```text
+raw_events.csv → Kafka → Consumer → Online Features → Predictions
+```
+
+---
+
+## 🧪 Testing
 
 ```bash
 pytest -v
 ```
 
-### Coverage
-
-- API endpoints  
-- Feature pipelines  
-- Model training  
-- Model registry  
-- CI validation path  
-
 ---
 
-## ▶️ How to Run
-
-### 1. Install dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
----
-
-### 2. Generate data
+## ▶️ Run System
 
 ```bash
 python generate_data.py
-```
-
----
-
-### 3. Run pipeline
-
-```bash
 python main.py
-```
-
----
-
-### 4. Start API
-
-```bash
 uvicorn api.app:app --reload
-```
-
-Open:
-
-```
-http://127.0.0.1:8000/docs
 ```
 
 ---
 
 ## 🔌 API Example
-
-### Request
 
 ```json
 {
@@ -290,38 +192,24 @@ http://127.0.0.1:8000/docs
 
 ---
 
-### Response
-
-```json
-{
-  "prediction": 1,
-  "probability_positive": 0.78,
-  "model_ready": true
-}
-```
-
----
-
 ## 🔥 Key Highlights
 
-- Distributed ML system with Spark  
-- Hybrid feature store (online + offline)  
-- Multi-model training (LR + XGBoost + LightGBM)  
-- Automated model selection  
-- Production-grade API  
-- Dockerized deployment  
-- CI/CD with GitHub Actions  
+- Distributed ML system  
+- Real-time + batch processing  
+- Multi-model training  
+- Model lifecycle management  
+- Kafka + Spark integration  
+- Production-ready architecture  
 
 ---
 
-## 🧠 Talking Points
+## 🧠 Interview Talking Points
 
-- Built end-to-end distributed ML platform  
-- Designed feature store architecture  
-- Integrated gradient boosting models  
-- Implemented model lifecycle management  
-- Enabled real-time inference  
-- Added Docker + CI/CD for production-style delivery  
+- Built end-to-end ML platform  
+- Designed feature store system  
+- Implemented streaming + batch pipelines  
+- Added model promotion logic  
+- Integrated MLOps tools (MLflow, CI/CD, Docker)  
 
 ---
 

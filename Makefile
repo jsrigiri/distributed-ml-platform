@@ -15,3 +15,6 @@ test:
 
 smoke:
 	python scripts/smoke_test.py
+
+promote:
+	python -m scripts/promote_challenger

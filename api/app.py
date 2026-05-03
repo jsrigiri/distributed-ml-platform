@@ -7,6 +7,14 @@ from core.config import FEATURE_COLUMNS, settings
 from core.logging import get_logger, setup_logging
 from monitoring.metrics import metrics
 
+from api.deps import (
+    champion_predictor,
+    challenger_predictor,
+    champion_registry,
+    challenger_registry,
+    online_builder,
+)
+
 setup_logging()
 logger = get_logger(__name__)
 
@@ -25,10 +33,13 @@ def health():
 
 @app.get("/ready")
 def ready():
-    predictor.reload_if_exists()
+    champion_predictor.reload_if_exists()
+    challenger_predictor.reload_if_exists()
     return {
-        "ready": predictor.is_ready(),
-        "model_exists": registry.exists(),
+        "champion_ready": champion_predictor.is_ready(),
+        "challenger_ready": challenger_predictor.is_ready(),
+        "champion_exists": champion_registry.exists(),
+        "challenger_exists": challenger_registry.exists(),
     }
 
 
@@ -39,26 +50,39 @@ def get_metrics():
 
 @app.get("/model_info")
 def model_info():
-    if not registry.exists():
-        raise HTTPException(status_code=404, detail="No model metadata found")
-    return registry.load_metadata()
+    return {
+        "champion": champion_registry.load_metadata(),
+        "challenger": challenger_registry.load_metadata(),
+    }
 
 
 @app.post("/predict", response_model=PredictionResponse)
 def predict(req: PredictionRequest):
-    predictor.reload_if_exists()
+    champion_predictor.reload_if_exists()
+    challenger_predictor.reload_if_exists()
+
+    predictor = champion_predictor if req.model_variant == "champion" else challenger_predictor
 
     if not predictor.is_ready():
-        raise HTTPException(status_code=503, detail="Model is not loaded")
+        raise HTTPException(
+            status_code=503,
+            detail=f"{req.model_variant} model is not loaded",
+        )
 
     row = req.model_dump()
+    row.pop("model_variant")
     df = pd.DataFrame([row], columns=FEATURE_COLUMNS)
 
     pred = int(predictor.predict(df)[0])
     prob = float(predictor.predict_proba(df)[0][1])
 
     metrics.log_prediction(prob)
-    logger.info("prediction_request prediction=%s probability_positive=%.6f", pred, prob)
+    logger.info(
+        "prediction_request variant=%s prediction=%s probability_positive=%.6f",
+        req.model_variant,
+        pred,
+        prob,
+    )
 
     return PredictionResponse(
         prediction=pred,

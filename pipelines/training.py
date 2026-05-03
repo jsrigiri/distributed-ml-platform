@@ -1,8 +1,13 @@
+import mlflow
+import mlflow.sklearn
+
 from core.config import FEATURE_COLUMNS, settings
+from core.exceptions import ModelPromotionError
 from core.logging import get_logger
 from models.registry import ModelRegistry
 from models.train import train_models
 from store.offline_store import OfflineFeatureStore
+from scripts.promote_challenger import promote
 
 logger = get_logger(__name__)
 
@@ -11,33 +16,58 @@ def run_training_pipeline(store_path: str):
     store = OfflineFeatureStore(store_path)
     df = store.read_pandas_df()
 
-    results = train_models(df, FEATURE_COLUMNS)
+    with mlflow.start_run(run_name="distributed_ml_platform_training"):
+        mlflow.log_param("random_state", settings.random_state)
+        mlflow.log_param("test_size", settings.test_size)
+        mlflow.log_param("online_warmup", settings.online_warmup)
 
-    # Select best classifier (by accuracy)
-    best_model_name = None
-    best_score = -1
-    best_model = None
+        results = train_models(df, FEATURE_COLUMNS)
 
-    for name, result in results.items():
-        if "metrics" in result and "accuracy" in result["metrics"]:
-            score = result["metrics"]["accuracy"]
-            logger.info(f"{name} accuracy={score:.4f}")
+        best_model_name = None
+        best_score = -1.0
+        best_model = None
 
-            if score > best_score:
-                best_score = score
-                best_model_name = name
-                best_model = result["model"]
+        all_metrics = {}
 
-    logger.info(f"BEST MODEL: {best_model_name} score={best_score:.4f}")
+        for name, result in results.items():
+            metrics = result["metrics"]
+            all_metrics[name] = metrics
 
-    registry = ModelRegistry(settings.model_path, settings.model_meta_path)
-    registry.save(
-        best_model,
-        {
-            "best_model": best_model_name,
-            "score": best_score,
-            "all_models": {k: v["metrics"] for k, v in results.items()},
-        },
-    )
+            for metric_name, metric_value in metrics.items():
+                mlflow.log_metric(f"{name}_{metric_name}", metric_value)
 
-    return best_model, best_score
+            if "accuracy" in metrics:
+                score = metrics["accuracy"]
+                logger.info("%s accuracy=%.4f", name, score)
+
+                if score > best_score:
+                    best_score = score
+                    best_model_name = name
+                    best_model = result["model"]
+
+        if best_model is None:
+            raise ModelPromotionError("No classifier model available for promotion.")
+
+        if best_score < settings.min_accuracy_to_promote:
+            raise ModelPromotionError(
+                f"Model did not meet promotion threshold: {best_score:.4f}"
+            )
+
+        mlflow.log_param("best_model_name", best_model_name)
+        mlflow.log_metric("best_model_accuracy", best_score)
+        mlflow.sklearn.log_model(best_model, artifact_path="best_model")
+
+        challenger_registry = ModelRegistry(settings.challenger_model_path, settings.challenger_meta_path)
+        challenger_registry.save(
+            best_model,
+            {
+                "status": "challenger",
+                "best_model": best_model_name,
+                "score": best_score,
+                "all_models": all_metrics,
+            },
+        )
+
+        promote()
+
+        return best_model, best_score

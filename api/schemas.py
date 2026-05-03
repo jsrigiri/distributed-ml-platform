@@ -1,3 +1,4 @@
+from typing import Literal
 from pydantic import BaseModel, Field
 
 
@@ -13,6 +14,7 @@ class PredictionRequest(BaseModel):
     rolling_std_event_value_5: float
     rolling_mobile_rate_5: float = Field(ge=0.0, le=1.0)
     events_seen: int = Field(ge=1)
+    model_variant: Literal["champion", "challenger"] = "champion"
 
 
 class PredictionResponse(BaseModel):
