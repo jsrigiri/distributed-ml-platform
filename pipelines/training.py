@@ -8,6 +8,7 @@ from models.registry import ModelRegistry
 from models.train import train_models
 from store.offline_store import OfflineFeatureStore
 from scripts.promote_challenger import promote
+from monitoring.drift import compute_feature_baseline, save_baseline
 
 logger = get_logger(__name__)
 
@@ -15,6 +16,10 @@ logger = get_logger(__name__)
 def run_training_pipeline(store_path: str):
     store = OfflineFeatureStore(store_path)
     df = store.read_pandas_df()
+
+    baseline = compute_feature_baseline(df, FEATURE_COLUMNS)
+    save_baseline(baseline, settings.drift_baseline_path)
+    logger.info("drift_baseline_saved path=%s", settings.drift_baseline_path)
 
     with mlflow.start_run(run_name="distributed_ml_platform_training"):
         mlflow.log_param("random_state", settings.random_state)

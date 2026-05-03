@@ -35,6 +35,9 @@ class Settings(BaseSettings):
     kafka_topic_events: str = "raw-events"
     kafka_consumer_group: str = "distributed-ml-platform-consumer"
 
+    drift_baseline_path: str = "artifacts/reports/drift_baseline.json"
+    drift_zscore_threshold: float = 3.0
+
 settings = Settings()
 
 Path(settings.model_dir).mkdir(parents=True, exist_ok=True)

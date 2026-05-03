@@ -5,6 +5,7 @@ from api.schemas import OnlineEventRequest, PredictionRequest, PredictionRespons
 from core.config import FEATURE_COLUMNS, settings
 from core.logging import get_logger, setup_logging
 from monitoring.metrics import metrics
+from monitoring.drift import detect_drift, load_baseline
 
 from api.deps import (
     champion_predictor,
@@ -120,4 +121,29 @@ def online_features(req: OnlineEventRequest):
         "ready": ready,
         "features": result,
         "warmup": settings.online_warmup,
+    }
+
+@app.post("/drift")
+def drift(req: PredictionRequest):
+    row = req.model_dump()
+    row.pop("model_variant", None)
+
+    baseline = load_baseline(settings.drift_baseline_path)
+
+    if not baseline:
+        raise HTTPException(
+            status_code=404,
+            detail="Drift baseline not found. Run training pipeline first.",
+        )
+
+    drift_detected, drift_report = detect_drift(
+        live_features=row,
+        baseline=baseline,
+        threshold=settings.drift_zscore_threshold,
+    )
+
+    return {
+        "drift_detected": drift_detected,
+        "threshold": settings.drift_zscore_threshold,
+        "report": drift_report,
     }
