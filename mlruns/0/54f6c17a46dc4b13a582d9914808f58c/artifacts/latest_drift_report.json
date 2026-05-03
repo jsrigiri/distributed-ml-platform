@@ -1,0 +1,89 @@
+{
+  "drift_detected": true,
+  "threshold": 3.0,
+  "summary": {
+    "max_drift_zscore": 4411.7092499453,
+    "mean_drift_zscore": 866.1244519229134,
+    "num_drifted_features": 7,
+    "num_checked_features": 11
+  },
+  "report": {
+    "event_value": {
+      "value": 100.0,
+      "train_mean": 0.8580044243423054,
+      "train_std": 0.6294833937262468,
+      "z_score": 157.49739637893148,
+      "drifted": true
+    },
+    "amount": {
+      "value": 10000.0,
+      "train_mean": 8.36526981727027,
+      "train_std": 4.418000767785473,
+      "z_score": 2261.5737876367657,
+      "drifted": true
+    },
+    "hour": {
+      "value": 12.0,
+      "train_mean": 11.54825641025641,
+      "train_std": 6.945043701658544,
+      "z_score": 0.06504546395233032,
+      "drifted": false
+    },
+    "is_mobile": {
+      "value": 1.0,
+      "train_mean": 0.4941025641025641,
+      "train_std": 0.4999780391542049,
+      "z_score": 1.011839313489138,
+      "drifted": false
+    },
+    "lag_event_value_1": {
+      "value": 100.0,
+      "train_mean": 0.8580391972103583,
+      "train_std": 0.6301094264148207,
+      "z_score": 157.34086278773012,
+      "drifted": true
+    },
+    "lag_amount_1": {
+      "value": 9000.0,
+      "train_mean": 8.364240140476086,
+      "train_std": 4.4238335625044725,
+      "z_score": 2032.5438633294953,
+      "drifted": true
+    },
+    "rolling_mean_event_value_5": {
+      "value": 100.0,
+      "train_mean": 0.8573924816684049,
+      "train_std": 0.44546402576351557,
+      "z_score": 222.56030068511896,
+      "drifted": true
+    },
+    "rolling_mean_amount_5": {
+      "value": 9000.0,
+      "train_mean": 8.360909119965566,
+      "train_std": 2.0381304799248774,
+      "z_score": 4411.7092499453,
+      "drifted": true
+    },
+    "rolling_std_event_value_5": {
+      "value": 50.0,
+      "train_mean": 0.469994037731837,
+      "train_std": 0.1761490387689512,
+      "z_score": 281.18238003691306,
+      "drifted": true
+    },
+    "rolling_mobile_rate_5": {
+      "value": 0.6,
+      "train_mean": 0.49254871794871796,
+      "train_std": 0.23225442181591774,
+      "z_score": 0.4626447204369986,
+      "drifted": false
+    },
+    "events_seen": {
+      "value": 5.0,
+      "train_mean": 21.0,
+      "train_std": 11.254917268744967,
+      "z_score": 1.421600853915842,
+      "drifted": false
+    }
+  }
+}

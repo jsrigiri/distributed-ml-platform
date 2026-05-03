@@ -1,0 +1,89 @@
+{
+  "drift_detected": false,
+  "threshold": 3.0,
+  "summary": {
+    "max_drift_zscore": 1.532759075035199,
+    "mean_drift_zscore": 0.6244392093428792,
+    "num_drifted_features": 0,
+    "num_checked_features": 11
+  },
+  "report": {
+    "event_value": {
+      "value": 1.1,
+      "train_mean": 0.8580044243423054,
+      "train_std": 0.6294833937262468,
+      "z_score": 0.3844352020554414,
+      "drifted": false
+    },
+    "amount": {
+      "value": 10.0,
+      "train_mean": 8.36526981727027,
+      "train_std": 4.418000767785473,
+      "z_score": 0.3700158213302302,
+      "drifted": false
+    },
+    "hour": {
+      "value": 12.0,
+      "train_mean": 11.54825641025641,
+      "train_std": 6.945043701658544,
+      "z_score": 0.06504546395233032,
+      "drifted": false
+    },
+    "is_mobile": {
+      "value": 1.0,
+      "train_mean": 0.4941025641025641,
+      "train_std": 0.4999780391542049,
+      "z_score": 1.011839313489138,
+      "drifted": false
+    },
+    "lag_event_value_1": {
+      "value": 1.0,
+      "train_mean": 0.8580391972103583,
+      "train_std": 0.6301094264148207,
+      "z_score": 0.2252954754182403,
+      "drifted": false
+    },
+    "lag_amount_1": {
+      "value": 9.5,
+      "train_mean": 8.364240140476086,
+      "train_std": 4.4238335625044725,
+      "z_score": 0.2567365710026676,
+      "drifted": false
+    },
+    "rolling_mean_event_value_5": {
+      "value": 1.05,
+      "train_mean": 0.8573924816684049,
+      "train_std": 0.44546402576351557,
+      "z_score": 0.4323750228797266,
+      "drifted": false
+    },
+    "rolling_mean_amount_5": {
+      "value": 9.8,
+      "train_mean": 8.360909119965566,
+      "train_std": 2.0381304799248774,
+      "z_score": 0.706083783255858,
+      "drifted": false
+    },
+    "rolling_std_event_value_5": {
+      "value": 0.2,
+      "train_mean": 0.469994037731837,
+      "train_std": 0.1761490387689512,
+      "z_score": 1.532759075035199,
+      "drifted": false
+    },
+    "rolling_mobile_rate_5": {
+      "value": 0.6,
+      "train_mean": 0.49254871794871796,
+      "train_std": 0.23225442181591774,
+      "z_score": 0.4626447204369986,
+      "drifted": false
+    },
+    "events_seen": {
+      "value": 5.0,
+      "train_mean": 21.0,
+      "train_std": 11.254917268744967,
+      "z_score": 1.421600853915842,
+      "drifted": false
+    }
+  }
+}

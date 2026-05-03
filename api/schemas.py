@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Literal, Optional
 from pydantic import BaseModel, Field
 
 model_variant: Literal["champion", "challenger"] = "champion"
@@ -23,6 +23,8 @@ class PredictionResponse(BaseModel):
     prediction: int
     probability_positive: float
     model_ready: bool
+    drift_detected: Optional[bool] = None
+    drift_summary: Optional[dict] = None
 
 
 class OnlineEventRequest(BaseModel):

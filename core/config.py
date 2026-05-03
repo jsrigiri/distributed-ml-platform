@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
 
     raw_data_path: str = "data/raw_events.csv"
+    raw_data_drift_path: str = "data/raw_events_with_drift.csv"
     offline_store_path: str = "data/offline_features.parquet"
 
     model_dir: str = "artifacts/models"
@@ -15,10 +16,11 @@ class Settings(BaseSettings):
     model_path: str = "artifacts/models/model.pkl"
     model_meta_path: str = "artifacts/models/model_meta.json"
 
-    online_warmup: int = 5
+    online_warmup: int = 2
     random_state: int = 42
     test_size: float = 0.2
     min_accuracy_to_promote: float = 0.60
+    drift_zscore_threshold: float = 1.5
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
@@ -36,7 +38,7 @@ class Settings(BaseSettings):
     kafka_consumer_group: str = "distributed-ml-platform-consumer"
 
     drift_baseline_path: str = "artifacts/reports/drift_baseline.json"
-    drift_zscore_threshold: float = 3.0
+    
 
 settings = Settings()
 

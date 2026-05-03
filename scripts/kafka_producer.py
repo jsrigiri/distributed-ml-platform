@@ -18,7 +18,10 @@ def main():
         value_serializer=json_serializer,
     )
 
-    df = pd.read_csv(settings.raw_data_path)
+    #df = pd.read_csv(settings.raw_data_path)
+    #df = pd.read_csv(settings.raw_data_drift_path)
+    df = pd.read_csv("data/raw_events_with_drift.csv")
+    print(df[["event_value", "amount", "is_drifted"]].head(5))
 
     for _, row in df.iterrows():
         event = {

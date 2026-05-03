@@ -6,6 +6,7 @@ from core.config import FEATURE_COLUMNS, settings
 from core.logging import get_logger, setup_logging
 from monitoring.metrics import metrics
 from monitoring.drift import detect_drift, load_baseline
+from monitoring.mlflow_drift import log_drift_to_mlflow
 
 from api.deps import (
     champion_predictor,
@@ -91,6 +92,34 @@ def predict(req: PredictionRequest):
     row = req.model_dump()
     row.pop("model_variant", None)
 
+    # -----------------------------
+    # Automatic drift check
+    # -----------------------------
+    baseline = load_baseline(settings.drift_baseline_path)
+
+    drift_detected = False
+    drift_summary = None
+
+    if baseline:
+        drift_detected, drift_report = detect_drift(
+            live_features=row,
+            baseline=baseline,
+            threshold=settings.drift_zscore_threshold,
+        )
+
+        if drift_detected:
+            drift_summary = log_drift_to_mlflow(
+                drift_detected=drift_detected,
+                drift_report=drift_report,
+                threshold=settings.drift_zscore_threshold,
+            )
+
+            logger.warning(
+                "feature_drift_detected variant=%s summary=%s",
+                req.model_variant,
+                drift_summary,
+            )
+
     df = pd.DataFrame([row], columns=FEATURE_COLUMNS)
 
     pred = int(predictor.predict(df)[0])
@@ -102,6 +131,8 @@ def predict(req: PredictionRequest):
         prediction=pred,
         probability_positive=prob,
         model_ready=True,
+        drift_detected=drift_detected,
+        drift_summary=drift_summary,
     )
 
 
@@ -142,8 +173,15 @@ def drift(req: PredictionRequest):
         threshold=settings.drift_zscore_threshold,
     )
 
+    summary = log_drift_to_mlflow(
+        drift_detected=drift_detected,
+        drift_report=drift_report,
+        threshold=settings.drift_zscore_threshold,
+    )
+
     return {
         "drift_detected": drift_detected,
         "threshold": settings.drift_zscore_threshold,
+        "summary": summary,
         "report": drift_report,
     }

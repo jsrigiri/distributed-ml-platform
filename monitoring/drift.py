@@ -48,19 +48,22 @@ def detect_drift(
         if feature not in baseline:
             continue
 
-        train_mean = baseline[feature]["mean"]
-        train_std = baseline[feature]["std"]
+        train_mean = float(baseline[feature]["mean"])
+        train_std = float(baseline[feature]["std"])
+
+        if train_std <= 0:
+            train_std = 1e-8
 
         z_score = abs((float(value) - train_mean) / train_std)
-
         is_drifted = z_score > threshold
+
         if is_drifted:
             drift_detected = True
 
         drift_report[feature] = {
             "value": float(value),
-            "train_mean": float(train_mean),
-            "train_std": float(train_std),
+            "train_mean": train_mean,
+            "train_std": train_std,
             "z_score": float(z_score),
             "drifted": bool(is_drifted),
         }

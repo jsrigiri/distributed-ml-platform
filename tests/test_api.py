@@ -137,6 +137,7 @@ def test_predict():
         "rolling_std_event_value_5": 0.15,
         "rolling_mobile_rate_5": 0.6,
         "events_seen": 5,
+        "model_variant": "champion",
     }
     response = client.post("/predict", json=payload)
     assert response.status_code == 200
@@ -144,3 +145,4 @@ def test_predict():
     assert "prediction" in body
     assert "probability_positive" in body
     assert body["model_ready"] is True
+    assert "drift_detected" in body
