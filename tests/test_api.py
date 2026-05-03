@@ -9,7 +9,7 @@ from core.config import FEATURE_COLUMNS, settings
 
 
 def ensure_model_exists():
-    if not os.path.exists(settings.model_path):
+    if not os.path.exists(settings.champion_model_path):
         X = pd.DataFrame(
             [
                 {
@@ -70,18 +70,18 @@ def ensure_model_exists():
         model = LogisticRegression(max_iter=1000)
         model.fit(X[FEATURE_COLUMNS], y)
 
-        os.makedirs(os.path.dirname(settings.model_path), exist_ok=True)
-        joblib.dump(model, settings.model_path)
+        os.makedirs(os.path.dirname(settings.champion_model_path), exist_ok=True)
+        joblib.dump(model, settings.champion_model_path)
 
         meta = {
             "status": "promoted",
             "metrics": {"accuracy": 1.0},
             "info": {"feature_columns": FEATURE_COLUMNS},
         }
-        os.makedirs(os.path.dirname(settings.model_meta_path), exist_ok=True)
+        os.makedirs(os.path.dirname(settings.champion_meta_path), exist_ok=True)
         import json
 
-        with open(settings.model_meta_path, "w", encoding="utf-8") as f:
+        with open(settings.champion_meta_path, "w", encoding="utf-8") as f:
             json.dump(meta, f)
 
 
